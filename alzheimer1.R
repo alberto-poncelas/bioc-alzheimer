@@ -1,18 +1,29 @@
 current_directory=getwd()
-dataset1_directory="./dataset1"
+
+data1_folder_name="dataset1"
+dataset1_directory=paste(current_directory,data1_folder_name,sep="/")
 
 
 library("affy")
 library("AnnotationDbi")
 
 
-#Load phenodata
+#####################################################
+############# LOAD DATA #############################
+#####################################################
+
+
+#Download raw data
+source("obtainRawData.R")
+obtainRawData("GSE28146",folder=data1_folder_name)
+
+
+#Load phenodata (from dataset1.txt)
 phdataset1<- read.table("dataset1.txt", sep="\t")
 colnames(phdataset1)<-c("samples","age","diseaseStage","title")
 
 
-#Filter control and severe
-
+#Filter control and severe, and store those .CEL names
 severeIndex<-grep("^severe",as.character(phdataset1[,3]))
 ControlIndex<-grep("^control",as.character(phdataset1[,3]))
 
@@ -22,22 +33,19 @@ d1names<-paste(d1names, ".CEL",sep = "")
 
 
 
-
-
-#Load AffyBatch 
+#Load AffyBatch (load only .CEL of "severe" and "control" ) 
 setwd(dataset1_directory)
 AffyBatchObject = ReadAffy(filenames=d1names)
 setwd(current_directory)
 
 
-
+#Attach the phenodata
 pData(AffyBatchObject)<-cbind(
-  		pData(AffyBatchObject),
+			pData(AffyBatchObject),
 			phdataset1[c(severeIndex,ControlIndex),])
 
 #Check the data has been correctly assigned to each sample
 pData(AffyBatchObject)
-
 
 
 #####################################################
