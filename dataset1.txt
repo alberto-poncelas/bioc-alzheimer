@@ -1,5 +1,4 @@
-
-GSM697332 65 years old	severe stage	Severe 723
+GSM697332	65 years old	severe stage	Severe 723
 GSM697312	75 years old	control	Control 1015
 GSM697327	79 years old	moderate stage	Moderate 1020
 GSM697334	79 years old	severe stage	Severe 819
