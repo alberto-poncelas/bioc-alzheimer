@@ -1,51 +1,54 @@
+#####################################################
+############# IMPORT DATA ###########################
+#####################################################
+
+
 current_directory=getwd()
 
-data1_folder_name="dataset1"
-dataset1_directory=paste(current_directory,data1_folder_name,sep="/")
+data_folder_name="data"
+dataset_directory=paste(current_directory,data_folder_name,sep="/")
 
 
 library("affy")
 library("AnnotationDbi")
 
 
-#####################################################
-############# LOAD DATA #############################
-#####################################################
-
-
 #Download raw data
 source("obtainRawData.R")
-obtainRawData("GSE28146",folder=data1_folder_name)
+obtainRawData("GSE28146",folder=data_folder_name)
 
 
-#Load phenodata (from dataset1.txt)
-phdataset1<- read.table("dataset1.txt", sep="\t")
-colnames(phdataset1)<-c("samples","age","diseaseStage","title")
+#Load phenodata (from dataset1.txt) and name columns
+phdataset<- read.table("phenodata.txt", sep="\t")
+colnames(phdataset)<-c("sampleNames","age","diseaseStage","title")
 
 
-#Filter control and severe, and store those .CEL names
-severeIndex<-grep("^severe",as.character(phdataset1[,3]))
-ControlIndex<-grep("^control",as.character(phdataset1[,3]))
+#Filter control and severe indexes 
+#(those which start by "sever" or "control" in "diseaseStage" column )
+severeIndex<-grep("^severe",as.character(phdataset[,"diseaseStage"]))
+ControlIndex<-grep("^control",as.character(phdataset[,"diseaseStage"]))
 
-d1names<-phdataset1[c(severeIndex,ControlIndex),1]
-d1names<- as.vector(d1names)
-d1names<-paste(d1names, ".CEL",sep = "")
+#Obtain the names of samples that are "severe" or "control"
+dnames<-phdataset[c(severeIndex,ControlIndex),"sampleNames"]
+dnames<-paste(dnames, ".CEL",sep = "")
 
 
 
 #Load AffyBatch (load only .CEL of "severe" and "control" ) 
-setwd(dataset1_directory)
-AffyBatchObject = ReadAffy(filenames=d1names)
+setwd(dataset_directory)
+AffyBatchObject = ReadAffy(filenames=dnames)
 setwd(current_directory)
 
 
 #Attach the phenodata
+#(the original phenodata with sample names plus the phenodata of "phenodata.txt")
 pData(AffyBatchObject)<-cbind(
 			pData(AffyBatchObject),
-			phdataset1[c(severeIndex,ControlIndex),])
+			phdataset[c(severeIndex,ControlIndex),])
 
 #Check the data has been correctly assigned to each sample
 pData(AffyBatchObject)
+
 
 
 #####################################################
@@ -53,7 +56,7 @@ pData(AffyBatchObject)
 #####################################################
 
 
-####Check for microarrays potentially problematics
+#####Check for microarrays potentially problematics####
 
 
 library("affyPLM")
@@ -99,11 +102,12 @@ AffyBatchRMA<-preprocess(AffyBatchObject,
 	normalize.method="quantile"
 )
 
-
+par( mfrow = c( 1, 2 ) )
 hist(AffyBatchMAS)
+title("Histogram with MAS")
 
 hist(AffyBatchRMA)
-
+title("Histogram with RMA")
 
 
 #######Convert to ExpressionSet
@@ -113,6 +117,9 @@ ExpressionSet<- expresso(AffyBatchObject,
 		normalize.method="quantiles",
 		pmcorrect.method="pmonly",
 		summary.method="medianpolish")
+
+###Also it is possible to execute RMA directly: 
+### ExpressionSet= rma(AffyBatchObject)
 
 
 ############################################################
