@@ -1,0 +1,37 @@
+# Function name: obtainRawData
+# Author: Alberto Poncelas
+
+# When in a script we need to lead a library from Bioconductor
+# which is not installed, we need to install it.
+# This function takes a vector with the names of packages 
+# and install the ones which have not been installed yet
+
+# The function parameters are:
+# ----packageList: a vector with the names of the packages 
+#  		that need to be installed
+
+
+installPackageList<-function(packageList){
+
+	#Get installed packages
+	installedPackages<-rownames(installed.packages())
+
+
+	checkInstalled<-packageList %in% installedPackages
+
+	if (! all(checkInstalled)==TRUE){
+		#Get the list of uninstalled packages
+		uninstalled<-packageList[checkInstalled==FALSE]
+
+		#Prepare Bioconductor
+		source("http://bioconductor.org/biocLite.R")
+		old.packages(repos=biocinstallRepos())
+		library("Biobase")
+
+		#install uninstalled packages
+		for (pckg in uninstalled){
+			biocLite(pckg)
+		}
+
+	}
+}
