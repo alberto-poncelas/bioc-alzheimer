@@ -1,0 +1,30 @@
+GSM697332  65 years old	severe stage	Severe 723
+GSM697312	75 years old	control	Control 1015
+GSM697327	79 years old	moderate stage	Moderate 1020
+GSM697334	79 years old	severe stage	Severe 819
+GSM697336	79 years old	severe stage	Severe 872
+GSM697309	80 years old	control	Control 1003
+GSM697311	80 years old	control	Control 1012
+GSM697328	81 years old	moderate stage	Moderate 1025
+GSM697326	82 years old	moderate stage	Moderate 965
+GSM697330	82 years old	moderate stage	Moderate 1037
+GSM697318	83 years old	incipient stage	Incipient 994
+GSM697325	83 years old	moderate stage	Moderate 856
+GSM697308	85 years old	control	Control 976
+GSM697323	85 years old	moderate stage	Moderate 826
+GSM697331	85 years old	severe stage	Severe 701
+GSM697329	86 years old	moderate stage	Moderate 1031
+GSM697315	87 years old	control	Control 1040
+GSM697319	88 years old	incipient stage	Incipient 1019
+GSM697321	88 years old	incipient stage	Incipient 1034
+GSM697324	89 years old	moderate stage	Moderate 832
+GSM697320	91 years old	incipient stage	Incipient 1029
+GSM697310	92 years old	control	Control 1008
+GSM697333	93 years old	severe stage	Severe 807
+GSM697337	93 years old	severe stage	Severe 1036
+GSM697335	94 years old	severe stage	Severe 867
+GSM697314	95 years old	control	Control 1030
+GSM697317	95 years old	incipient stage	Incipient 720
+GSM697313	97 years old	control	Control 1018
+GSM697322	97 years old	incipient stage	Incipient 1043
+GSM697316	101 years old	incipient stage	Incipient 715
