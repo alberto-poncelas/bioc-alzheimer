@@ -122,59 +122,169 @@ ExpressionSet<- expresso(AffyBatchObject,
 ### ExpressionSet= rma(AffyBatchObject)
 
 
+
+
+
+
+
+
 ############################################################
-######################FILTER GENES#########################
+###################### FILTER GENES ########################
 ############################################################
 
+####Filter by variance####
 library("genefilter")
 ExpressionSet<-nsFilter(ExpressionSet,var.cutoff=0.6)$eset
 
 
-#Filter by mean tests
-N=50 #Number of genes we want to keep
+####Filter by mean tests####
+N=50 #Number of genes we want to keep. Keep 50 genes
 
 varLabels(ExpressionSet)
-#Two groups will be regarding diseaseStage
+#Two groups will be created depending on diseaseStage
 
-
+# Perform a mean difference hypothesis test 
+# between two groups for each gene
 RowTestTable = rowttests(ExpressionSet, "diseaseStage")
+
+# Obtain the genes with the lowest p-value
 order=order(RowTestTable$p.value)[1:N]
 features=featureNames(ExpressionSet)[order] 
 
-#In variable features here is stored the N genes which have more variance between
-# control groul and alzheimer group
+
+# Display a plot volcano.
+# We highlight with a blue dot
+# the 50 points with the lowest pvalue
+plot(RowTestTable$dm,
+	-log10(RowTestTable$p.value),
+	xlab="mean differences (in log-ratio)",
+	ylab=expression(-log[10]~(p-value)))
 
 
-#Filter the ExpressionSet and keep only N genes
+points(	RowTestTable$dm[order], 
+		-log10(RowTestTable$p.value)[order], 
+		pch=18, col="blue")
+
+
+
+
+#Order RowTestTable by p-value
+RowTestTable<-RowTestTable[order(RowTestTable$p.value),]
+
+
+# Filter the ExpressionSet and keep only obtained
+# N genes (50 in this case)
 ExpressionSet=ExpressionSet[features,]
 
 
 
 ############################################################
-################   MACHINE LEARNING   #####################
+################     CLASSIFICATION    #####################
 ############################################################
 
-#Scale ExpressionSet
+#####Scale ExpressionSet###
 library("matrixStats")
 M<-exprs(ExpressionSet) #Obtain the matrix of ExpressionSet
 esetScaled<-(M- rowMedians(M))/rowIQRs(M) #Scale the ExpressionSet
 exprs(ExpressionSet)<-esetScaled
 
 
-#Compute distance matrix (for later uses)
-Distances=dist(exprs(ExpressionSet),method="euclidean")
+
+
+library("MLInterfaces")
+
+fvalidation<-xvalSpec("LOO")
+f<-formula(paste("diseaseStage", "~ .")) #f is "diseaseStage ~ ."
+
+##### KNN ####
+ClassifierKNN = MLearn(f, 
+		data=ExpressionSet,
+		.method=knnI(k=1),
+		trainInd=fvalidation)
+
+
+# Obtain confusion matrix
+confusionMatrixKNN<-confuMat(ClassifierKNN ) 
 
 
 
 
-#################CLustering
 
+### Random forest ####
+ClassifierRForest =MLearn(f,
+		data=ExpressionSet,
+		.method=randomForestI,
+		ntree=100,
+		trainInd=fvalidation)
+
+
+# Obtain confusion matrix
+confusionMatrixRForest<-confuMat(ClassifierRForest) 
+
+
+#### Display confusion matrices###
+confusionMatrixRForest<-
+		confusionMatrixRForest[c("control","severe stage"),
+						c("control","severe stage")]
+confusionMatrixRForest
+
+
+
+## Display both confusion matrices
+confusionMatrixKNN
+confusionMatrixRForest
+
+
+
+
+
+
+
+############################################################
+##################     CLUSTERING    #######################
+############################################################
+
+
+
+#####Compute distance matrix #####
+# between samples, and also between probes
+DistanceSamples=dist(t(exprs(ExpressionSet)),method="euclidean")
+DistanceProbes=dist(exprs(ExpressionSet),method="euclidean")
+
+
+
+
+######Clustering of samples#############
+#We display PCA to have an intuition of 
+#the number of clusters of samples
+PCAsamples<-prcomp(t(exprs(ExpressionSet)))
+plot(PCAsamples$x [,1], PCAsamples$x [,2])
+
+
+HierarchicalClustSamples=hclust(DistanceSamples,method="single")
+plot(HierarchicalClustSamples)
+
+
+
+######Clustering of probes##################
 #We display PCA to have an intuition of the number of clusters
-PCA<-prcomp(exprs(ExpressionSet))
-plot(PCA$x [,1], PCA$x [,2])
+PCAprobes<-prcomp(exprs(ExpressionSet))
+plot(PCAprobes$x [,1], PCAprobes$x [,2])
+
+text(PCAprobes$x[,1],
+	PCAprobes$x[,2]-0.2,
+	labels=featureNames(ExpressionSet))
 
 
 
+
+##Hierarchichal clustering of probes####
+HierarchicalClustProbes=hclust(DistanceProbes,method="single")
+plot(HierarchicalClustProbes)
+
+
+
+####K-means####
 #We decide to set the number of clusters as 2
 CLUSTER_NUMBER=2
 kmeans=kmeans(exprs(ExpressionSet),centers=CLUSTER_NUMBER,nstart=5)
@@ -185,13 +295,11 @@ for (i in 1:CLUSTER_NUMBER){
 	ClusterGenes[[i]]<-names(kmeans$cluster[kmeans$cluster==i])
 }
 
+
+
+
 ClusterGenes
 
-
-
-##Hierarchichal clustering
-HierarchicalClust=hclust(Distances,method="single")
-plot(HierarchicalClust)
 
 
 
