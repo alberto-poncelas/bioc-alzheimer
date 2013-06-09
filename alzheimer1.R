@@ -296,10 +296,44 @@ for (i in 1:CLUSTER_NUMBER){
 }
 
 
-
-
 ClusterGenes
 
+
+
+
+
+
+
+
+############################################################
+#############     GENE INFORMATION    ######################
+############################################################
+
+
+
+
+annotation(ExpressionSet)
+
+library("hgu133plus2.db")
+
+#Entrez genes data.frame
+entrezGenesDB<-merge(
+		toTable(hgu133plus2ENTREZID),
+		toTable(hgu133plus2GENENAME))
+
+
+
+
+
+
+# In 'features' is stored the 50 probes
+# with smallest p-value (ordered)
+
+#Obtain 10 features
+features10<-features[1:10]
+
+#Find the probes in the table
+entrezGenesDB[ entrezGenesDB$probe_id %in% features10,]
 
 
 
