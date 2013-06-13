@@ -317,9 +317,9 @@ annotation(ExpressionSet)
 library("hgu133plus2.db")
 
 #Entrez genes data.frame
-entrezGenesDB<-merge(
-		toTable(hgu133plus2ENTREZID),
-		toTable(hgu133plus2GENENAME))
+genesDB<-merge(
+	toTable(hgu133plus2ENTREZID),
+	toTable(hgu133plus2GENENAME))
 
 
 
@@ -333,7 +333,7 @@ entrezGenesDB<-merge(
 features10<-features[1:10]
 
 #Find the probes in the table
-entrezGenesDB[ entrezGenesDB$probe_id %in% features10,]
+genesDB[ genesDB$probe_id %in% features10,]
 
 
 
