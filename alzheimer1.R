@@ -278,7 +278,7 @@ text(PCAprobes$x[,1],
 
 
 
-##Hierarchichal clustering of probes####
+##Hierarchical clustering of probes####
 HierarchicalClustProbes=hclust(DistanceProbes,method="single")
 plot(HierarchicalClustProbes)
 
