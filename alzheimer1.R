@@ -18,7 +18,7 @@ source("obtainRawData.R")
 obtainRawData("GSE28146",folder=data_folder_name)
 
 
-#Load phenodata (from dataset1.txt) and name columns
+#Load phenodata (from "phenodata.txt") and name columns
 phdataset<- read.table("phenodata.txt", sep="\t")
 colnames(phdataset)<-c("sampleNames","age","diseaseStage","title")
 
