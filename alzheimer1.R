@@ -1,3 +1,9 @@
+#install all required libraries
+source("installPackageList.R")
+libraries<-c("affy","AnnotationDbi","affyPLM","simpleaffy","genefilter","matrixStats","MLInterfaces","hgu133plus2.db")
+installPackageList(libraries)
+
+
 #####################################################
 ############# IMPORT DATA ###########################
 #####################################################
