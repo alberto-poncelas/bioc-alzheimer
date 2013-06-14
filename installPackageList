@@ -34,4 +34,13 @@ installPackageList<-function(packageList){
 		}
 
 	}
+	
+	
+	# load libraries
+	for (lib in packageList){
+		print(lib)
+		do.call(library, list(lib))
+
+	}
+
 }
