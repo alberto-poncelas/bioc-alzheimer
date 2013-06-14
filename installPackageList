@@ -1,4 +1,4 @@
-# Function name: obtainRawData
+# Function name: installPackageList
 # Author: Alberto Poncelas
 
 # When in a script we need to lead a library from Bioconductor
